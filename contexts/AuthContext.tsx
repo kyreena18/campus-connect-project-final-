@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Use mock authentication if Supabase is not configured
       if (!isSupabaseConfigured() || !supabase) {
         // Mock admin login for development
-        if (code && password) {
+        if (code.trim() && password.trim()) {
           const mockAdmin: User = {
             id: 'mock-admin-id',
             name: 'Mock Administrator',
@@ -118,10 +118,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Use mock authentication if Supabase is not configured
       if (!isSupabaseConfigured() || !supabase) {
         // Mock student login for development
-        if (uid && email) {
+        if (uid.trim() && email.trim() && email.includes('@')) {
           const mockStudent: User = {
             id: 'mock-student-id',
-            name: 'Student User',
+            name: `Student ${uid}`,
             email: email,
             type: 'student',
             uid: uid,
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false);
           return { success: true };
         } else {
-          return { success: false, error: 'Please enter both UID and email.' };
+          return { success: false, error: 'Please enter a valid UID and email address.' };
         }
       }
 
@@ -192,7 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Use mock registration if Supabase is not configured
       if (!isSupabaseConfigured() || !supabase) {
-        if (data.name && data.uid && data.email && data.rollNo) {
+        if (data.name.trim() && data.uid.trim() && data.email.trim() && data.rollNo.trim() && data.email.includes('@')) {
           const mockStudent: User = {
             id: 'mock-student-id',
             name: data.name,
@@ -206,7 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false);
           return { success: true };
         } else {
-          return { success: false, error: 'Please fill in all required fields.' };
+          return { success: false, error: 'Please fill in all required fields with valid data.' };
         }
       }
 
