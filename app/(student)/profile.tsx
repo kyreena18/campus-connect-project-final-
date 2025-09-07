@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
-    marginBottom: 40,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.1,
@@ -493,10 +493,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   formSection: {
-    gap: 20,
+    gap: 24,
   },
   inputGroup: {
-    gap: 8,
+    marginBottom: 4,
   },
   label: {
     fontSize: 16,
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
     color: '#1C1C1E',
   },
   dropdownContainer: {
-    gap: 8,
+    gap: 12,
   },
   dropdownOption: {
     flexDirection: 'row',
@@ -574,7 +574,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
     borderRadius: 12,
     paddingVertical: 16,
-    marginTop: 24,
+    marginTop: 32,
+    marginBottom: 40,
     gap: 8,
   },
   disabledButton: {

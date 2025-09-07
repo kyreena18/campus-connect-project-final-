@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    gap: screenHeight * 0.02, // 2% of screen height
+    gap: screenHeight * 0.025, // 2.5% of screen height
   },
   loginButton: {
     backgroundColor: '#FFFFFF',
@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
   buttonContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
   },
   buttonText: {
     fontSize: Math.max(screenWidth * 0.045, 16), // 4.5% of width, min 16px
@@ -134,8 +133,7 @@ const styles = StyleSheet.create({
     fontSize: Math.max(screenWidth * 0.032, 12), // 3.2% of width, min 12px
     color: '#6B6B6B',
     textAlign: 'center',
-    lineHeight: Math.max(screenWidth * 0.04, 16),
+    lineHeight: Math.max(screenWidth * 0.045, 18),
     paddingHorizontal: screenWidth * 0.02,
-    flexWrap: 'wrap',
   },
 });

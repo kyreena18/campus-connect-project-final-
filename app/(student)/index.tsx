@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   notificationButton: {
     position: 'relative',
@@ -230,9 +230,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    flexGrow: 1,
     paddingHorizontal: 20,
-    paddingBottom: 20, // Space for the bottom tab bar
+    paddingBottom: 40,
   },
   notificationsSection: {
     marginBottom: 24,
@@ -295,13 +294,13 @@ const styles = StyleSheet.create({
   quickStatsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    gap: 16,
   },
   quickStatCard: {
-    width: '48%',
+    flex: 1,
+    minWidth: 140,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 16,
     alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
