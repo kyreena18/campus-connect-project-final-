@@ -52,7 +52,9 @@ export default function StudentProfile() {
   const setupRealtimeSubscription = () => {
     if (!user?.id) return;
 
-    const channel = supabase
+    if (!supabase || !isSupabaseConfigured()) return;
+
+    const channel = supabase!
       .channel('student-profile-changes')
       .on(
         'postgres_changes',
@@ -80,7 +82,7 @@ export default function StudentProfile() {
     try {
       setLoading(true);
       
-      if (!isSupabaseConfigured() || !supabase) {
+      if (!isSupabaseConfigured()) {
         // Use mock data if Supabase is not configured
         setProfile(prev => ({
           ...prev,
@@ -92,7 +94,7 @@ export default function StudentProfile() {
         return;
       }
       
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('student_profiles')
         .select('*')
         .eq('student_id', user.id)
@@ -130,7 +132,7 @@ export default function StudentProfile() {
       setSaving(true);
       setError('');
 
-      if (!isSupabaseConfigured() || !supabase) {
+      if (!isSupabaseConfigured()) {
         // Mock save for development
         await new Promise(resolve => setTimeout(resolve, 1000));
         Alert.alert('Success', 'Profile saved successfully! (Demo mode)');
@@ -153,7 +155,7 @@ export default function StudentProfile() {
       };
 
       // Also update the class in the students table
-      const { error: studentUpdateError } = await supabase
+      const { error: studentUpdateError } = await supabase!
         .from('students')
         .update({ class: profile.class })
         .eq('id', user.id);
@@ -162,7 +164,7 @@ export default function StudentProfile() {
         console.error('Error updating student class:', studentUpdateError);
       }
 
-      const { data: existingProfile } = await supabase
+      const { data: existingProfile } = await supabase!
         .from('student_profiles')
         .select('id')
         .eq('student_id', user.id)
@@ -170,13 +172,13 @@ export default function StudentProfile() {
 
       let error;
       if (existingProfile) {
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabase!
           .from('student_profiles')
           .update(profileData)
           .eq('student_id', user.id);
         error = updateError;
       } else {
-        const { error: insertError } = await supabase
+        const { error: insertError } = await supabase!
           .from('student_profiles')
           .insert(profileData);
         error = insertError;
@@ -218,7 +220,7 @@ export default function StudentProfile() {
       const response = await fetch(fileUri);
       const blob = await response.blob();
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase!.storage
         .from('student-documents')
         .upload(fileName, blob, {
           contentType: 'application/pdf',
@@ -231,7 +233,7 @@ export default function StudentProfile() {
         return;
       }
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = supabase!.storage
         .from('student-documents')
         .getPublicUrl(fileName);
 

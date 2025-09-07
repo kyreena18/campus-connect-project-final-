@@ -26,7 +26,7 @@ export default function AdminStudentsScreen() {
   const loadClassStats = async () => {
     try {
       // Use mock data if Supabase is not configured
-      if (!isSupabaseConfigured() || !supabase) {
+      if (!isSupabaseConfigured()) {
         // Mock data for development
         const classDefinitions = [
           { className: 'TYIT', displayName: 'Third Year IT', description: 'Information Technology - Final Year', color: '#007AFF' },
@@ -43,7 +43,7 @@ export default function AdminStudentsScreen() {
       }
 
       // Real Supabase query
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('student_profiles')
         .select('class')
         .not('class', 'is', null);

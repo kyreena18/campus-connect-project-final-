@@ -56,24 +56,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       
-      // Use mock authentication if Supabase is not configured
-      if (!isSupabaseConfigured() || !supabase) {
-        // Mock admin login for development
-        if (code.trim() && password.trim()) {
-          const mockAdmin: User = {
-            id: 'mock-admin-id',
-            name: 'Mock Administrator',
-            email: 'admin@college.edu',
-            type: 'admin',
-            adminCode: code,
-          };
-          setUser(mockAdmin);
-          setUserType('admin');
-          setLoading(false);
-          return { success: true };
-        } else {
-          return { success: false, error: 'Please enter both admin code and password.' };
-        }
+      if (!supabase) {
+        setLoading(false);
+        return { success: false, error: 'Database connection not available. Please check your configuration.' };
       }
 
       const { data, error } = await supabase
@@ -115,25 +100,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
 
-      // Use mock authentication if Supabase is not configured
-      if (!isSupabaseConfigured() || !supabase) {
-        // Mock student login for development
-        if (uid.trim() && email.trim() && email.includes('@')) {
-          const mockStudent: User = {
-            id: 'mock-student-id',
-            name: `Student ${uid}`,
-            email: email,
-            type: 'student',
-            uid: uid,
-            rollNo: uid,
-          };
-          setUser(mockStudent);
-          setUserType('student');
-          setLoading(false);
-          return { success: true };
-        } else {
-          return { success: false, error: 'Please enter a valid UID and email address.' };
-        }
+      if (!supabase) {
+        setLoading(false);
+        return { success: false, error: 'Database connection not available. Please check your configuration.' };
       }
 
       const { data, error } = await supabase
@@ -190,24 +159,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
 
-      // Use mock registration if Supabase is not configured
-      if (!isSupabaseConfigured() || !supabase) {
-        if (data.name.trim() && data.uid.trim() && data.email.trim() && data.rollNo.trim() && data.email.includes('@')) {
-          const mockStudent: User = {
-            id: 'mock-student-id',
-            name: data.name,
-            email: data.email,
-            type: 'student',
-            uid: data.uid,
-            rollNo: data.rollNo,
-          };
-          setUser(mockStudent);
-          setUserType('student');
-          setLoading(false);
-          return { success: true };
-        } else {
-          return { success: false, error: 'Please fill in all required fields with valid data.' };
-        }
+      if (!supabase) {
+        setLoading(false);
+        return { success: false, error: 'Database connection not available. Please check your configuration.' };
       }
 
       // Check if student already exists
