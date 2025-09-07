@@ -44,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // In a real app, you'd check for stored session tokens
       // For now, we'll just set loading to false after the delay
+      await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to prevent race conditions
       setLoading(false);
     } catch (error) {
       console.error('Session check error:', error);

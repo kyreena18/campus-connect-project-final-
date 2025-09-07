@@ -7,6 +7,13 @@ import { AuthProvider } from '@/contexts/AuthContext';
 export default function RootLayout() {
   useFrameworkReady();
   
+  // Ensure environment variables are loaded
+  useEffect(() => {
+    if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
+      console.warn('EXPO_PUBLIC_SUPABASE_URL not found, using fallback');
+    }
+  }, []);
+  
   return (
     
     <AuthProvider>
