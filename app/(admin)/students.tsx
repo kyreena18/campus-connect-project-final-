@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Users, GraduationCap, ChevronRight, Plus } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface ClassStats {
   className: string;
@@ -25,9 +25,8 @@ export default function AdminStudentsScreen() {
 
   const loadClassStats = async () => {
     try {
-      // Check if Supabase is configured
-      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-      if (!supabaseUrl || supabaseUrl.includes('your-project-id')) {
+      // Use mock data if Supabase is not configured
+      if (!isSupabaseConfigured() || !supabase) {
         // Mock data for development
         const classDefinitions = [
           { className: 'TYIT', displayName: 'Third Year IT', description: 'Information Technology - Final Year', color: '#007AFF' },

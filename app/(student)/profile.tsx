@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { User, Hash, FileText, GraduationCap, Building, Upload, Save, LogOut, Mail } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import * as DocumentPicker from 'expo-document-picker';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
@@ -79,6 +79,19 @@ export default function StudentProfile() {
 
     try {
       setLoading(true);
+      
+      if (!isSupabaseConfigured() || !supabase) {
+        // Use mock data if Supabase is not configured
+        setProfile(prev => ({
+          ...prev,
+          full_name: user.name || '',
+          uid: user.uid || '',
+          roll_no: user.rollNo || '',
+        }));
+        setLoading(false);
+        return;
+      }
+      
       const { data, error } = await supabase
         .from('student_profiles')
         .select('*')
@@ -116,6 +129,14 @@ export default function StudentProfile() {
     try {
       setSaving(true);
       setError('');
+
+      if (!isSupabaseConfigured() || !supabase) {
+        // Mock save for development
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        Alert.alert('Success', 'Profile saved successfully! (Demo mode)');
+        setSaving(false);
+        return;
+      }
 
       const profileData = {
         student_id: user.id,

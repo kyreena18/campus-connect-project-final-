@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 type UserType = 'admin' | 'student' | null;
 
@@ -56,9 +56,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       
-      // For development without Supabase, use mock authentication
-      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-      if (!supabaseUrl || supabaseUrl.includes('your-project-id')) {
+      // Use mock authentication if Supabase is not configured
+      if (!isSupabaseConfigured() || !supabase) {
         // Mock admin login for development
         if (code === 'ADMIN001' && password === 'admin123') {
           const mockAdmin: User = {
@@ -116,9 +115,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
 
-      // For development without Supabase, use mock authentication
-      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-      if (!supabaseUrl || supabaseUrl.includes('your-project-id')) {
+      // Use mock authentication if Supabase is not configured
+      if (!isSupabaseConfigured() || !supabase) {
         // Mock student login for development
         const mockStudent: User = {
           id: 'mock-student-id',
@@ -187,6 +185,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }) => {
     try {
       setLoading(true);
+
+      // Use mock registration if Supabase is not configured
+      if (!isSupabaseConfigured() || !supabase) {
+        const mockStudent: User = {
+          id: 'mock-student-id',
+          name: data.name,
+          email: data.email,
+          type: 'student',
+          uid: data.uid,
+          rollNo: data.rollNo,
+        };
+        setUser(mockStudent);
+        setUserType('student');
+        setLoading(false);
+        return { success: true };
+      }
 
       // Check if student already exists
       const { data: existingStudent } = await supabase
