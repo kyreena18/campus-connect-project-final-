@@ -226,6 +226,9 @@ export default function StudentProfile() {
           contentType: 'application/pdf',
           upsert: true,
           cacheControl: '3600',
+          metadata: {
+            'Content-Disposition': 'inline'
+          }
         });
 
       if (uploadError) {

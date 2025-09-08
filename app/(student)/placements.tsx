@@ -107,6 +107,9 @@ export default function PlacementsScreen() {
           contentType: file.mimeType || 'application/pdf',
           upsert: true,
           cacheControl: '3600',
+          metadata: {
+            'Content-Disposition': 'inline'
+          }
         });
 
       if (uploadError) {
@@ -454,6 +457,9 @@ export default function PlacementsScreen() {
           contentType: file.mimeType || 'application/pdf',
           upsert: true,
           cacheControl: '3600',
+          metadata: {
+            'Content-Disposition': 'inline'
+          }
         });
 
       if (uploadError) {

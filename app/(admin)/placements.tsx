@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Modal } from 'react-native';
+import { Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Plus, Briefcase, Eye, X, User, Download, FileText } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -284,7 +285,10 @@ export default function AdminPlacementsScreen() {
           target_audience: newEvent.eligible_classes.length > 0 ? 'specific_class' : 'all',
           target_classes: newEvent.eligible_classes,
           created_by: user?.id,
-          is_active: true,
+          cacheControl: '3600',
+          metadata: {
+            'Content-Disposition': 'inline'
+          }
         });
       
       loadPlacementEvents();
@@ -736,11 +740,12 @@ export default function AdminPlacementsScreen() {
                         style={styles.viewOfferLetterButton}
                         onPress={() => {
                           try {
-                            // Force the URL to open in browser for viewing instead of downloading
-                            const viewUrl = application.offer_letter_url.includes('?') 
-                              ? `${application.offer_letter_url}&view=true` 
-                              : `${application.offer_letter_url}?view=true`;
-                            window.open(viewUrl, '_blank');
+                           // Open the URL directly - it should now display inline
+                           if (Platform.OS === 'web') {
+                             window.open(application.offer_letter_url, '_blank');
+                           } else {
+                             Linking.openURL(application.offer_letter_url);
+                           }
                           } catch (error) {
                             Alert.alert('Error', 'Failed to open offer letter.');
                           }

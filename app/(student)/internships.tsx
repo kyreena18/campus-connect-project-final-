@@ -182,6 +182,9 @@ export default function StudentInternshipsScreen() {
           contentType: file.mimeType || 'application/pdf',
           upsert: true,
           cacheControl: '3600',
+          metadata: {
+            'Content-Disposition': 'inline'
+          }
         });
 
       if (uploadError) {
