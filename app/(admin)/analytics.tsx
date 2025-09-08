@@ -250,7 +250,7 @@ export default function AnalyticsScreen() {
     }
   };
 
-  const generateReport = () => {
+  const generateReport = async () => {
     try {
       // Create workbook
       const wb = XLSX.utils.book_new();
