@@ -106,6 +106,7 @@ export default function PlacementsScreen() {
         .upload(fileName, blob, {
           contentType: file.mimeType || 'application/pdf',
           upsert: true,
+          cacheControl: '3600',
         });
 
       if (uploadError) {
@@ -452,6 +453,7 @@ export default function PlacementsScreen() {
         .upload(fileName, blob, {
           contentType: file.mimeType || 'application/pdf',
           upsert: true,
+          cacheControl: '3600',
         });
 
       if (uploadError) {

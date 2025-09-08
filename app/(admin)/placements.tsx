@@ -224,8 +224,8 @@ export default function AdminPlacementsScreen() {
       
       const { error: bucketError } = await supabase.storage.createBucket(bucketName, {
         public: true,
-        allowedMimeTypes: ['application/pdf', 'video/*', 'image/*'],
-        fileSizeLimit: 10485760, // 10MB
+        allowedMimeTypes: ['application/pdf', 'video/*', 'image/*', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+        fileSizeLimit: 52428800, // 50MB
       });
 
       if (bucketError) {

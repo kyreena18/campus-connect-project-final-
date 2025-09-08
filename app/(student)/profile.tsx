@@ -225,6 +225,7 @@ export default function StudentProfile() {
         .upload(fileName, blob, {
           contentType: 'application/pdf',
           upsert: true,
+          cacheControl: '3600',
         });
 
       if (uploadError) {
