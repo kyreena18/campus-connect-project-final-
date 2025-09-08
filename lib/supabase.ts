@@ -13,6 +13,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   global: {
     headers: {
       'Cache-Control': 'no-cache',
+      'Cache-Control': 'public, max-age=3600',
     },
   },
 });
@@ -27,13 +28,7 @@ export const isSupabaseConfigured = () => {
 // Helper function to get public URL with proper headers
 export const getPublicUrl = (bucket: string, path: string) => {
   const { data } = supabase.storage.from(bucket).getPublicUrl(path, {
-    transform: {
-      width: undefined,
-      height: undefined,
-      resize: undefined,
-      format: undefined,
-      quality: undefined,
-    },
+    download: false, // Ensure inline viewing instead of download
   });
   return data.publicUrl;
 };
