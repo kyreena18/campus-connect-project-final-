@@ -6,7 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as ExpoLinking from 'expo-linking';
 import { Briefcase, Calendar, Building, Users, FileText, Upload, X, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Bell } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { supabase, uploadFile, getPublicUrl } from '@/lib/supabase';
 import { formatDate, getStatusColor, getRequirementLabel } from '@/lib/utils';
 import * as DocumentPicker from 'expo-document-picker';
 
@@ -101,35 +101,14 @@ export default function PlacementsScreen() {
       const response = await fetch(file.uri);
       const blob = await response.blob();
 
-      const { error: uploadError } = await supabase.storage
-        .from('placement-offer-letters')
-        .upload(fileName, blob, {
-          contentType: file.mimeType || 'application/pdf',
-          upsert: true,
-          cacheControl: '3600',
-          metadata: {
-            'Content-Disposition': 'inline'
-          }
-        });
-
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        Alert.alert('Upload Failed', 'Could not upload offer letter.');
-        setUploading(null);
-        return;
-      }
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('placement-offer-letters')
-        .getPublicUrl(fileName);
-
-      const fileUrl = urlData?.publicUrl || '';
+      const { publicUrl } = await uploadFile('placement-offer-letters', fileName, blob, {
+        contentType: file.mimeType || 'application/pdf',
+      });
 
       // Update application with offer letter URL
       const { error } = await supabase
         .from('placement_applications')
-        .update({ offer_letter_url: fileUrl })
+        .update({ offer_letter_url: publicUrl })
         .eq('id', applicationId);
 
       if (error) {
@@ -449,31 +428,9 @@ export default function PlacementsScreen() {
       const response = await fetch(file.uri);
       const blob = await response.blob();
 
-      // Upload to placement-offer-letters bucket for offer letters
-      const targetBucket = 'placement-offer-letters';
-      const { error: uploadError } = await supabase.storage
-        .from(targetBucket)
-        .upload(fileName, blob, {
-          contentType: file.mimeType || 'application/pdf',
-          upsert: true,
-          cacheControl: '3600',
-          metadata: {
-            'Content-Disposition': 'inline'
-          }
-        });
-
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        Alert.alert('Upload Failed', `Could not upload ${getRequirementLabel(requirementType)}.`);
-        return;
-      }
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from(targetBucket)
-        .getPublicUrl(fileName);
-
-      const fileUrl = urlData?.publicUrl || '';
+      const { publicUrl } = await uploadFile('placement-offer-letters', fileName, blob, {
+        contentType: file.mimeType || 'application/pdf',
+      });
 
       // Get the application for this event
       const application = applications.find(app => app.placement_event_id === eventId);
@@ -500,7 +457,7 @@ export default function PlacementsScreen() {
         .upsert({
           placement_application_id: application.id,
           requirement_id: requirementData.id,
-          file_url: fileUrl,
+          file_url: publicUrl,
           submission_status: 'pending',
           submitted_at: new Date().toISOString(),
         }, { onConflict: 'placement_application_id,requirement_id' });
@@ -512,8 +469,8 @@ export default function PlacementsScreen() {
       // Update local state to reflect the upload
       const key = `${eventId}_${requirementType}`;
       setSubmittedRequirements(prev => ({ ...prev, [key]: true }));
-      if (fileUrl) {
-        setRequirementUrls(prev => ({ ...prev, [key]: fileUrl }));
+      if (publicUrl) {
+        setRequirementUrls(prev => ({ ...prev, [key]: publicUrl }));
       }
     } catch (error) {
       console.error('Upload error:', error);

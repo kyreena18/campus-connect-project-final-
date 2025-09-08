@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { User, Hash, FileText, GraduationCap, Building, Upload, Save, LogOut, Mail } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured, uploadFile, getPublicUrl } from '@/lib/supabase';
 import * as DocumentPicker from 'expo-document-picker';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
@@ -220,33 +220,16 @@ export default function StudentProfile() {
       const response = await fetch(fileUri);
       const blob = await response.blob();
 
-      const { error: uploadError } = await supabase!.storage
-        .from('student-documents')
-        .upload(fileName, blob, {
-          contentType: 'application/pdf',
-          upsert: true,
-          cacheControl: '3600',
-          metadata: {
-            'Content-Disposition': 'inline'
-          }
-        });
+      const { publicUrl } = await uploadFile('student-documents', fileName, blob, {
+        contentType: file.mimeType || 'application/pdf',
+      });
 
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        Alert.alert('Upload Failed', `Could not upload ${type === 'resume' ? 'resume' : type + ' marksheet'}.`);
-        return;
-      }
-
-      const { data: urlData } = supabase!.storage
-        .from('student-documents')
-        .getPublicUrl(fileName);
-
-      if (urlData?.publicUrl) {
+      if (publicUrl) {
         const urlKey = type === 'resume' ? 'resume_url' : 
                       type === '10th' ? 'marksheet_10th_url' : 'marksheet_12th_url';
         setProfile((prev) => ({
           ...prev,
-          [urlKey]: urlData.publicUrl,
+          [urlKey]: publicUrl,
         }));
       }
       

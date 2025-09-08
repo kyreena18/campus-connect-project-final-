@@ -10,6 +10,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
   },
+  global: {
+    headers: {
+      'Cache-Control': 'no-cache',
+    },
+  },
 });
 
 // Helper function to check if Supabase is configured
@@ -17,6 +22,51 @@ export const isSupabaseConfigured = () => {
   return !!(supabaseUrl && supabaseAnonKey && 
     !supabaseUrl.includes('your-project-id') && 
     !supabaseAnonKey.includes('your-anon-key'));
+};
+
+// Helper function to get public URL with proper headers
+export const getPublicUrl = (bucket: string, path: string) => {
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path, {
+    transform: {
+      width: undefined,
+      height: undefined,
+      resize: undefined,
+      format: undefined,
+      quality: undefined,
+    },
+  });
+  return data.publicUrl;
+};
+
+// Helper function to upload file with proper settings
+export const uploadFile = async (
+  bucket: string,
+  path: string,
+  file: File | Blob,
+  options?: {
+    contentType?: string;
+    cacheControl?: string;
+  }
+) => {
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(path, file, {
+      contentType: options?.contentType || 'application/pdf',
+      cacheControl: options?.cacheControl || '3600',
+      upsert: true,
+      metadata: {
+        'Content-Disposition': 'inline',
+      },
+    });
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    data,
+    publicUrl: getPublicUrl(bucket, path),
+  };
 };
 
 export type Database = {

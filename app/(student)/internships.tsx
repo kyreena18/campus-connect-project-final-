@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'rea
 import { LinearGradient } from 'expo-linear-gradient';
 import { GraduationCap, Upload, FileText, Bell, Lock } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { supabase, uploadFile, getPublicUrl } from '@/lib/supabase';
 import { STATIC_ASSIGNMENTS } from '@/lib/constants';
 import { formatDate, getStatusColor } from '@/lib/utils';
 import * as DocumentPicker from 'expo-document-picker';
@@ -175,41 +175,16 @@ export default function StudentInternshipsScreen() {
 
       console.log('Blob created, size:', blob.size);
 
-      // Upload to Supabase storage
-      const { error: uploadError } = await supabase.storage
-        .from('student-documents')
-        .upload(fileName, blob, {
-          contentType: file.mimeType || 'application/pdf',
-          upsert: true,
-          cacheControl: '3600',
-          metadata: {
-            'Content-Disposition': 'inline'
-          }
-        });
-
-      if (uploadError) {
-        console.error('Upload error details:', {
-          error: uploadError,
-          bucket: actualBucket,
-          fileName: fileName,
-          message: uploadError.message
-        });
-        Alert.alert('Upload Failed', `Could not upload ${title}.\n\nError: ${uploadError.message}\nBucket: ${actualBucket}\nFile: ${fileName}`);
-        setUploading(null);
-        return;
-      }
+      // Upload to Supabase storage using helper function
+      const { publicUrl } = await uploadFile('student-documents', fileName, blob, {
+        contentType: file.mimeType || 'application/pdf',
+      });
 
       console.log(`Successfully uploaded to bucket: ${actualBucket}`);
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('student-documents')
-        .getPublicUrl(fileName);
+      console.log('File URL:', publicUrl);
 
-      const fileUrl = urlData?.publicUrl || '';
-      console.log('File URL:', fileUrl);
-
-      if (!fileUrl) {
+      if (!publicUrl) {
         Alert.alert('Error', 'Failed to get file URL after upload');
         setUploading(null);
         return;
@@ -221,7 +196,7 @@ export default function StudentInternshipsScreen() {
         .upsert({
           student_id: user.id,
           assignment_type: assignmentType,
-          file_url: fileUrl,
+          file_url: publicUrl,
           submission_status: 'submitted',
           submitted_at: new Date().toISOString(),
         }, { onConflict: 'student_id,assignment_type' });
@@ -232,7 +207,7 @@ export default function StudentInternshipsScreen() {
         throw error;
       }
 
-      console.log('Upload successful:', { title, fileUrl });
+      console.log('Upload successful:', { title, publicUrl });
       Alert.alert('Success', `${title} uploaded successfully!`);
       loadSubmissions();
     } catch (error) {
