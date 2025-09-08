@@ -6,7 +6,8 @@ import { ChevronLeft, Upload, FileText, Users, Download } from 'lucide-react-nat
 import { supabase } from '@/lib/supabase';
 import * as DocumentPicker from 'expo-document-picker';
 import * as XLSX from 'xlsx';
-import * as FileSaver from 'file-saver';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 interface StudentData {
   name: string;
@@ -45,9 +46,15 @@ export default function BulkImportScreen() {
         { wch: 12 }, // year
       ];
 
-      const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([wbout], { type: 'application/octet-stream' });
-      FileSaver.saveAs(blob, 'student_import_template.xlsx');
+      const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'base64' });
+      const filename = 'student_import_template.xlsx';
+      const fileUri = FileSystem.documentDirectory + filename;
+      
+      await FileSystem.writeAsStringAsync(fileUri, wbout, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      
+      await Sharing.shareAsync(fileUri);
 
       Alert.alert('Template Downloaded', 'Fill in the template with student data and upload it back.');
     } catch (error) {

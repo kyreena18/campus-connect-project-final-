@@ -5,7 +5,8 @@ import { ChartBar as BarChart3, Users, Building, TrendingUp, Award, Download, Ch
 import { supabase } from '@/lib/supabase';
 import { formatDate } from '@/lib/utils';
 import * as XLSX from 'xlsx';
-import * as FileSaver from 'file-saver';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 interface PlacementStats {
   totalCompanies: number;
@@ -300,9 +301,15 @@ export default function AnalyticsScreen() {
       
       // Save the Excel file
       const timestamp = new Date().toISOString().split('T')[0];
-      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([wbout], { type: 'application/octet-stream' });
-      FileSaver.default.saveAs(blob, `Placement_Analytics_Report_${timestamp}.xlsx`);
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+      const filename = `Placement_Analytics_Report_${timestamp}.xlsx`;
+      const fileUri = FileSystem.documentDirectory + filename;
+      
+      await FileSystem.writeAsStringAsync(fileUri, wbout, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      
+      await Sharing.shareAsync(fileUri);
       
       Alert.alert('Success', 'Analytics report downloaded successfully as Excel file!');
     } catch (error) {
